@@ -1,0 +1,31 @@
+#!/bin/sh
+
+######################################################
+#  Невеличка програма, яка змінює розмір зображення  #
+#  до заданого та наносить логотип                   #
+#                                                    #
+#  Автор - Андрій Кондратьєв [h0st@ukr.net]          #
+#  Спеціально для сайту Голос Криворіжжя             #
+#  http://www.holoskr.com                            #
+######################################################
+
+
+###### Визначаємо основні змінні та налаштування ########
+
+OUT_PREFIX="_labeled"   				# Текст, котрий додається в 
+SIZE="1024x1024" 						# Розмір найбільшої сторони зображення
+WATERMARK="/home/keed/rect2997.png" 	# Шлях до доготипу
+TRANSPARENT="75%"						# Прозорість накладеного логотипу
+DESTFOLDER="export"						# Тека для перетворених зображень
+
+if [ ! -d $DESTFOLDER ]; then
+	mkdir $DESTFOLDER
+fi
+
+for i in $(find . -maxdepth 1 -name "*.[J|j][P|p][E|e][G|g]" -o -name "*.[J|j][P|p][G|g]" -type f | sed -e 's/.\///g'); do
+	echo "Змінюємо розмір $i"
+	convert -resize $SIZE $i tmp_$i
+	echo "Накладаємо логотип на $i"
+	composite -gravity SouthEast "$WATERMARK" -dissolve "$TRANSPARENT" "tmp_$i" "$DESTFOLDER/$i"
+	rm "tmp_$i"
+done
